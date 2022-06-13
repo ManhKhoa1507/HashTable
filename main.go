@@ -22,30 +22,35 @@ func main() {
 	hash_map_data := table.List{}
 
 	// Scan number of elements
-	numberOfElement := getInput(&hash_map_data)
+	numberOfElement := getInputFromScreen(&hash_map_data)
 	TABLE_SIZE = numberOfElement + 1
 
 	//Init hash table with m index with m is prime and m >= n
 	for isPrime(TABLE_SIZE) != true {
 		TABLE_SIZE++
 	}
-	// Create Hashtable
+	// Create Hashtable and call hash function
 	hash_table_array := createTable()
 	HashFunction(&hash_map_data, hash_table_array)
+
+	// Print hash table
+	PrintHashTable(hash_table_array)
 }
 
 // Get input from screen then insert to linked list
 // n: number of elements
 // l: key list (linked list)
-func getInput(hash_map_data *table.List) int {
+func getInputFromScreen(hash_map_data *table.List) int {
 	// Read input from screen
 	fmt.Println("------- Get input from screen-------")
 	var numberOfElement int
 	fmt.Scanf("%d", &numberOfElement)
 
 	for i := 0; i < numberOfElement; i++ {
-		var value int
-		var temp_key string
+		var (
+			value    string
+			temp_key string
+		)
 
 		fmt.Println("Element ", i)
 		fmt.Scanf("%v %v", &temp_key, &value)
@@ -56,6 +61,15 @@ func getInput(hash_map_data *table.List) int {
 		hash_map_data.Insert(key, value)
 	}
 	return numberOfElement
+}
+
+// Print hash table
+func PrintHashTable(hash_table []hash_table_value) {
+	fmt.Println("--------Hash table-------")
+	len_table := len(hash_table)
+	for i := 0; i < len_table; i++ {
+		fmt.Println(i, hash_table[i].key, hash_table[i].value)
+	}
 }
 
 // Create key for elements
@@ -142,7 +156,6 @@ func HashFunction(hash_map_data *table.List, hash_table []hash_table_value) {
 		}
 
 	}
-	fmt.Println(hash_table)
 	fmt.Println("Collision count: ", collision_count)
 }
 

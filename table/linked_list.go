@@ -3,7 +3,7 @@ package table
 import "fmt"
 
 type Node struct {
-	Key   int         // key = pointer_size - log2(list_size), like hashmap golang
+	Key   int         // key
 	Value interface{} // Node's value
 	Next  *Node       // Next node
 }
@@ -16,7 +16,6 @@ type List struct {
 // Insert 1 node to tail of linked list
 func (l *List) Insert(key int, value interface{}) {
 	node := createNewNode(key, value)
-
 	if l.checkEmpty() == true {
 		// If empty linked list add to head
 		l.Head = node
