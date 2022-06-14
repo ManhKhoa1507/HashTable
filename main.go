@@ -53,7 +53,7 @@ func getHashMapInput(hashMapData *table.List) int {
 	// Read input from screen
 	fmt.Println("------- Get input from screen-------")
 	var numberOfElement int
-	fmt.Println("Number of elements: ")
+	fmt.Println("Number of elements")
 	fmt.Scanf("%d", &numberOfElement)
 
 	for i := 0; i < numberOfElement; i++ {
