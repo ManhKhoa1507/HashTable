@@ -10,7 +10,7 @@ var (
 	TABLE_SIZE = 0
 )
 
-type hash_table_value struct {
+type HashTableValue struct {
 	key   int
 	value interface{}
 }
@@ -19,10 +19,10 @@ func main() {
 	fmt.Println("-----------Hash table using linked list-------------")
 
 	// Init hash_map_data
-	hash_map_data := table.List{}
+	hashMapData := table.List{}
 
-	// Scan number of elements
-	numberOfElement := getHashMapInput(&hash_map_data)
+	// Scan number of elements and hash_list
+	numberOfElement := getHashMapInput(&hashMapData)
 	TABLE_SIZE = numberOfElement + 1
 
 	//Init hash table with m index with m is prime and m >= n
@@ -30,21 +30,26 @@ func main() {
 		TABLE_SIZE++
 	}
 	// Create Hashtable and call hash function
-	hash_table_array := createTable()
-	HashFunction(&hash_map_data, hash_table_array)
+	hashTableArray := createTable()
+	HashFunction(&hashMapData, hashTableArray)
 
 	// Print hash table
-	PrintHashTable(hash_table_array)
+	PrintHashTable(hashTableArray)
 
 	// Search value using keyword
 	keyword, value := getKeywordAndValue()
-	Search(keyword, value, hash_table_array)
+	indexResult := IndexSearch(keyword, value, hashTableArray)
+
+	// Print hashTable[indexResult]
+	if indexResult != -1 {
+		PrintSearch(indexResult, hashTableArray)
+	}
 }
 
 // Get input from screen then insert to linked list
 // n: number of elements
 // l: key list (linked list)
-func getHashMapInput(hash_map_data *table.List) int {
+func getHashMapInput(hashMapData *table.List) int {
 	// Read input from screen
 	fmt.Println("------- Get input from screen-------")
 	var numberOfElement int
@@ -52,17 +57,17 @@ func getHashMapInput(hash_map_data *table.List) int {
 
 	for i := 0; i < numberOfElement; i++ {
 		var (
-			value    string
-			temp_key string
+			value   string
+			tempKey string
 		)
 
 		fmt.Println("Element ", i)
-		fmt.Scanf("%s %s", &temp_key, &value)
+		fmt.Scanf("%s %s", &tempKey, &value)
 
-		key := createKey(temp_key)
+		key := createKey(tempKey)
 
 		// fmt.Println("key: ", key)
-		hash_map_data.Insert(key, value)
+		hashMapData.Insert(key, value)
 	}
 	return numberOfElement
 }
@@ -80,21 +85,27 @@ func getKeywordAndValue() (string, string) {
 }
 
 // Print hash table
-func PrintHashTable(hash_table []hash_table_value) {
+func PrintHashTable(hashTable []HashTableValue) {
 	fmt.Println("--------Hash table-------")
-	len_table := len(hash_table)
-	for i := 0; i < len_table; i++ {
-		fmt.Println(i, hash_table[i].key, hash_table[i].value)
+	lenTable := len(hashTable)
+
+	for i := 0; i < lenTable; i++ {
+		fmt.Println(i, hashTable[i].key, hashTable[i].value)
 	}
+}
+
+// Func print search result
+func PrintSearch(position int, hashTable []HashTableValue) {
+	fmt.Println("Value: ", hashTable[position])
 }
 
 // Create key for elements
 func createKey(value string) int {
-	len_string := len(value)
+	lenString := len(value)
 	key := 0
 	runes := []rune(value)
 
-	for i := 0; i < len_string; i++ {
+	for i := 0; i < lenString; i++ {
 		key += int(runes[i])
 	}
 	return key
@@ -106,8 +117,8 @@ func isPrime(num int) bool {
 		return false
 	}
 
-	sq_root := int(math.Sqrt(float64(num)))
-	for i := 2; i <= sq_root; i++ {
+	sqRoot := int(math.Sqrt(float64(num)))
+	for i := 2; i <= sqRoot; i++ {
 		if num%i == 0 {
 			return false
 		}
@@ -116,15 +127,15 @@ func isPrime(num int) bool {
 }
 
 // Create hash table using linked list with m elements
-func createTable() []hash_table_value {
+func createTable() []HashTableValue {
 	// Init table array
 	fmt.Println("-----Create table-----")
-	var a = make([]hash_table_value, 0, TABLE_SIZE)
+	var a = make([]HashTableValue, 0, TABLE_SIZE)
 
 	for i := 0; i < TABLE_SIZE; i++ {
 
 		// Create temp element to append to array
-		element := new(hash_table_value)
+		element := new(HashTableValue)
 		element.key = 0
 		element.value = 0
 
@@ -134,74 +145,74 @@ func createTable() []hash_table_value {
 }
 
 // Hash function
-func HashFunction(hash_map_data *table.List, hash_table []hash_table_value) {
-	list_len := hash_map_data.LengthOfList()
-	collision_count := 0
+func HashFunction(hashMapData *table.List, hashTable []HashTableValue) {
+	listLen := hashMapData.LengthOfList()
+	collisionCount := 0
 
-	for i := 0; i < list_len; i++ {
+	for i := 0; i < listLen; i++ {
 
 		// Get node's value
-		node := hash_map_data.GetElementAtPosition(i)
+		node := hashMapData.GetElementAtPosition(i)
 		value := node.Value
 		key := node.Key
 
 		// Calc position
-		position_a := hashFuncA(key, TABLE_SIZE)
+		positionA := hashFuncA(key, TABLE_SIZE)
 
-		// If not collision add to position_a
-		isEmpty := checkEmptyPosition(hash_table, position_a)
+		// If not collision add to positionA
+		isEmpty := checkEmptyPosition(hashTable, positionA)
 		if isEmpty == true {
-			addToIndex(position_a, key, value, hash_table)
+			addToIndex(positionA, key, value, hashTable)
 		} else {
-			collision_count++
+			collisionCount++
 			// collision solve
-			mod_count := 1
+			modCount := 1
 
-			for collisionSolve(position_a, key, value, hash_table, mod_count) != true {
+			for collisionSolve(positionA, key, value, hashTable, modCount) != true {
 
-				// Increase mod_count if cann't insert
-				// fmt.Println("\n mod_count: ", mod_count)
-				mod_count++
+				// Increase modCount if cann't insert
+				// fmt.Println("\n modCount: ", modCount)
+				modCount++
 			}
 		}
 
 	}
-	fmt.Println("Collision count: ", collision_count)
+	fmt.Println("Collision count: ", collisionCount)
 }
 
 // Conllision Solve
-func collisionSolve(position_a int, key int, value interface{}, hash_table []hash_table_value, mod_count int) bool {
+func collisionSolve(positionA int, key int, value interface{}, hashTable []HashTableValue, modCount int) bool {
 
 	// Calc b := hashFuncB, then calc the collision
-	position_b := hashFuncB(key, TABLE_SIZE)
-	collision_position := hashFuncIfCollision(position_a, position_b, mod_count, TABLE_SIZE)
-	// fmt.Println("Collision pos: ", collision_position)
+	positionB := hashFuncB(key, TABLE_SIZE)
+	collisionPosition := hashFuncIfCollision(positionA, positionB, modCount, TABLE_SIZE)
+	// fmt.Println("Collision pos: ", collisionPosition)
 
 	// If not empty return false
-	// Else add value to collision_position
-	if checkEmptyPosition(hash_table, collision_position) == false {
+	// Else add value to collisionPosition
+	if checkEmptyPosition(hashTable, collisionPosition) == false {
 		return false
 	} else {
-		addToIndex(collision_position, key, value, hash_table)
+		addToIndex(collisionPosition, key, value, hashTable)
 		return true
 	}
 }
 
 // Add value to index
-func addToIndex(position int, key_add int, value_add interface{}, hash_table []hash_table_value) {
+func addToIndex(position int, keyAdd int, valueAdd interface{}, hashTable []HashTableValue) {
 	// Check position to add
 	// Add if empty
 
-	if checkEmptyPosition(hash_table, position) == true {
-		hash_table[position].key = key_add
-		hash_table[position].value = value_add
+	if checkEmptyPosition(hashTable, position) == true {
+		hashTable[position].key = keyAdd
+		hashTable[position].value = valueAdd
 	}
 }
 
 // Check position is empty or not
 // Return false if not empty
 // Return true if empty
-func checkEmptyPosition(a []hash_table_value, position int) bool {
+func checkEmptyPosition(a []HashTableValue, position int) bool {
 	if a[position].key != 0 {
 		return false
 	} else {
@@ -221,44 +232,86 @@ func hashFuncB(key int, mod int) int {
 	return (mod - 2) - key%(mod-2)
 }
 
-// hash if collision = (a+mod_count*b)%mod
-func hashFuncIfCollision(a int, b int, mod_count int, mod int) int {
-	return (a + mod_count*b) % mod
+// hash if collision = (a+modCount*b)%mod
+func hashFuncIfCollision(a int, b int, modCount int, mod int) int {
+	return (a + modCount*b) % mod
 }
 
 // Search index using key
-func Search(keyword string, value string, hash_table []hash_table_value) hash_table_value {
+func IndexSearch(keyword string, value string, hashTable []HashTableValue) int {
 	fmt.Println("------------Searching-------------")
-	var result hash_table_value
+	index := -1
 
+	// Create key for searching
 	key := createKey(keyword)
-	position_a := hashFuncA(key, TABLE_SIZE)
 
-	// If found value and key not collision return hash_table[position]
-	if checkValue(key, value, position_a, hash_table) == true {
-		result = hash_table[position_a]
+	// Calc position an check value at hashTable[position]
+	positionA := hashFuncA(key, TABLE_SIZE)
+	isValue := checkValue(key, value, positionA, hashTable)
+	// isNil := checkNil(positionA, hashTable)
+
+	// If found value and key not collision return hashTable[position]
+	if isValue == true {
+		index = positionA
 	} else {
 		// If collision, measn value != hashtable[position].value
-		// Calc another position
-		fmt.Println("---------Collision seaching------------")
-		position_b := hashFuncB(key, TABLE_SIZE)
-		mod_count := 1
-		collision_position := hashFuncIfCollision(position_a, position_b, mod_count, TABLE_SIZE)
-
-		// If
-		for checkValue(key, value, collision_position, hash_table) != true {
-			mod_count++
-			collision_position = hashFuncIfCollision(position_a, position_b, mod_count, TABLE_SIZE)
-		}
+		index = collisionSearch(positionA, key, value, hashTable)
 	}
-	return result
+	return index
 }
 
-// CheckValue if hash_table[postion].key == key and hash_table[postion].value == value
+// Collision searching
+func collisionSearch(positionA int, key int, value string, hashTable []HashTableValue) int {
+	// If collision, measn value != hashtable[position].value
+	fmt.Println("---------Collision seaching------------")
+	positionB := hashFuncB(key, TABLE_SIZE)
+	modCount := 0
+	isValue := false
+	index := -1
+
+	// If not value find another position
+	// Increase modCount and check value
+	for isValue != true {
+
+		// Calc another position
+		modCount++
+		collisionPosition := hashFuncIfCollision(positionA, positionB, modCount, TABLE_SIZE)
+		isValue = checkValue(key, value, collisionPosition, hashTable)
+		isNil := checkNil(collisionPosition, hashTable)
+
+		// If not found key or value return -1
+		if isNil {
+			fmt.Println("Key not found")
+			break
+		}
+
+		// If found right value break
+		if isValue {
+			index = collisionPosition
+			break
+		}
+	}
+
+	// Return index position
+	// If not found return -1
+	return index
+}
+
+// CheckValue if hashTable[postion].key == key and hashTable[postion].value == value
 // Return true if found, else return false
-func checkValue(key int, value string, position int, hash_table []hash_table_value) bool {
-	if hash_table[position].value == value && hash_table[position].key == key {
+func checkValue(key int, value string, position int, hashTable []HashTableValue) bool {
+	if hashTable[position].value == value && hashTable[position].key == key {
 		fmt.Println("Found value at position: ", position)
+		return true
+	}
+	return false
+}
+
+// Check i hashTable[position].value == 0 or hashTable[position].key == 0
+// Return true if =0
+// Else return 0
+func checkNil(position int, hashTable []HashTableValue) bool {
+	if hashTable[position].key == 0 || hashTable[position].value == 0 {
 		return true
 	}
 	return false
