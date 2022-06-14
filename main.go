@@ -35,6 +35,9 @@ func main() {
 
 	// Print hash table
 	PrintHashTable(hash_table_array)
+
+	// Search value using keyword
+	Search("abc", "123", hash_table_array)
 }
 
 // Get input from screen then insert to linked list
@@ -53,9 +56,9 @@ func getInputFromScreen(hash_map_data *table.List) int {
 		)
 
 		fmt.Println("Element ", i)
-		fmt.Scanf("%v %v", &temp_key, &value)
+		fmt.Scanf("%s %s", &temp_key, &value)
 
-		key := createKey(temp_key, i+1)
+		key := createKey(temp_key)
 
 		// fmt.Println("key: ", key)
 		hash_map_data.Insert(key, value)
@@ -73,21 +76,15 @@ func PrintHashTable(hash_table []hash_table_value) {
 }
 
 // Create key for elements
-func createKey(value string, position int) int {
-	key := sumString(value) * position
-	return key
-}
-
-// Calculate sum of string
-func sumString(str string) int {
-	len_string := len(str)
-	sum := 0
-	runes := []rune(str)
+func createKey(value string) int {
+	len_string := len(value)
+	key := 0
+	runes := []rune(value)
 
 	for i := 0; i < len_string; i++ {
-		sum += int(runes[i])
+		key += int(runes[i])
 	}
-	return sum
+	return key
 }
 
 // Check prime number
@@ -214,4 +211,42 @@ func hashFuncB(key int, mod int) int {
 // hash if collision = (a+mod_count*b)%mod
 func hashFuncIfCollision(a int, b int, mod_count int, mod int) int {
 	return (a + mod_count*b) % mod
+}
+
+// Search index using key
+func Search(keyword string, value string, hash_table []hash_table_value) hash_table_value {
+	fmt.Println("------------Searching-------------")
+	var result hash_table_value
+
+	key := createKey(keyword)
+	position_a := hashFuncA(key, TABLE_SIZE)
+
+	// If found value and key not collision return hash_table[position]
+	if checkValue(key, value, position_a, hash_table) == true {
+		result = hash_table[position_a]
+	} else {
+		// If collision, measn value != hashtable[position].value
+		// Calc another position
+		fmt.Println("---------Collision seaching------------")
+		position_b := hashFuncB(key, TABLE_SIZE)
+		mod_count := 1
+		collision_position := hashFuncIfCollision(position_a, position_b, mod_count, TABLE_SIZE)
+
+		// If
+		for checkValue(key, value, collision_position, hash_table) != true {
+			mod_count++
+			collision_position = hashFuncIfCollision(position_a, position_b, mod_count, TABLE_SIZE)
+		}
+	}
+	return result
+}
+
+// CheckValue if hash_table[postion].key == key and hash_table[postion].value == value
+// Return true if found, else return false
+func checkValue(key int, value string, position int, hash_table []hash_table_value) bool {
+	if hash_table[position].value == value && hash_table[position].key == key {
+		fmt.Println("Found value at position: ", position)
+		return true
+	}
+	return false
 }
