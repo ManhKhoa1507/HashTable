@@ -22,7 +22,7 @@ func main() {
 	hash_map_data := table.List{}
 
 	// Scan number of elements
-	numberOfElement := getInputFromScreen(&hash_map_data)
+	numberOfElement := getHashMapInput(&hash_map_data)
 	TABLE_SIZE = numberOfElement + 1
 
 	//Init hash table with m index with m is prime and m >= n
@@ -37,13 +37,14 @@ func main() {
 	PrintHashTable(hash_table_array)
 
 	// Search value using keyword
-	Search("abc", "123", hash_table_array)
+	keyword, value := getKeywordAndValue()
+	Search(keyword, value, hash_table_array)
 }
 
 // Get input from screen then insert to linked list
 // n: number of elements
 // l: key list (linked list)
-func getInputFromScreen(hash_map_data *table.List) int {
+func getHashMapInput(hash_map_data *table.List) int {
 	// Read input from screen
 	fmt.Println("------- Get input from screen-------")
 	var numberOfElement int
@@ -64,6 +65,18 @@ func getInputFromScreen(hash_map_data *table.List) int {
 		hash_map_data.Insert(key, value)
 	}
 	return numberOfElement
+}
+
+// func get keyword and value for searching
+func getKeywordAndValue() (string, string) {
+	var keyword, value string
+
+	fmt.Println("Enter keyword: ")
+	fmt.Scanf("%s", &keyword)
+	fmt.Println("Enter value: ")
+	fmt.Scanf("%s", &value)
+
+	return keyword, value
 }
 
 // Print hash table
